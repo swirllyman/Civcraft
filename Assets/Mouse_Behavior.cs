@@ -25,15 +25,21 @@ public class Mouse_Behavior : NetworkBehaviour
         {
             if (Physics.Raycast(ray, out hit))
             {
-                var spawnPosition = hit.point;
-                Debug.Log(spawnPosition);
-                var spawnRotation = Quaternion.Euler(0, 0, 0);
-
-                var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation);
-                NetworkServer.Spawn(enemy);
+                CmdSpawnThatShit(hit.point);
             }
         }
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+    }
+
+    [Command]
+    void CmdSpawnThatShit(Vector3 spawnSpot)
+    {
+        var spawnPosition = spawnSpot;
+        Debug.Log(spawnPosition);
+        var spawnRotation = Quaternion.Euler(0, 0, 0);
+
+        var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation);
+        NetworkServer.Spawn(enemy);
     }
 
     void OnGUI()

@@ -23,22 +23,5 @@ public class BasicMovement : NetworkBehaviour {
     {
         if (!isLocalPlayer) return;
         transform.Translate(Input.GetAxis("Horizontal") * Time.deltaTime * moveSpeed, 0, Input.GetAxis("Vertical") * Time.deltaTime * moveSpeed);
-
-        Ray ray = myCam.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit))
-        {
-            ColorChanger c = hit.transform.GetComponent<ColorChanger>();
-            if (c != null && Input.GetMouseButtonDown(0))
-            {
-                CmdChangeObjectColor(c.gameObject);
-            }
-        }
-    }
-
-    [Command]
-    void CmdChangeObjectColor(GameObject g)
-    {
-        g.GetComponent<ColorChanger>().CmdNextColor();
     }
 }
