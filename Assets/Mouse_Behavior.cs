@@ -21,7 +21,7 @@ public class Mouse_Behavior : NetworkBehaviour
         {
             return;
         }
-        if (Input.GetMouseButton(0) && build)
+        if (Input.GetMouseButtonDown(0) && build)
         {
             if (Physics.Raycast(ray, out hit))
             {
@@ -35,7 +35,6 @@ public class Mouse_Behavior : NetworkBehaviour
     void CmdSpawnThatShit(Vector3 spawnSpot)
     {
         var spawnPosition = spawnSpot;
-        Debug.Log(spawnPosition);
         var spawnRotation = Quaternion.Euler(0, 0, 0);
 
         var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation);

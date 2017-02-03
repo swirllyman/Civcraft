@@ -9,6 +9,7 @@ public class EnemySpawner : NetworkBehaviour
 
     void Start()
     {
+        if (!isServer) return;
         for (int i = 0; i < numberOfEnemies; i++)
         {
             var spawnPosition = gameObject.transform.position + new Vector3(Random.Range(-8.0f, 8.0f), 0.0f, Random.Range(-8.0f, 8.0f));
