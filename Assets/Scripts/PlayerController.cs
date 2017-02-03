@@ -7,7 +7,7 @@ public enum SelectionState { hover, selected, none}
 public class PlayerController : NetworkBehaviour {
 
     public SelectionState selectionState = SelectionState.none;
-    public List<Unit> currentUnits = new List<Unit>();
+    public List<GameObject> currentUnits = new List<GameObject>();
 	
 	// Update is called once per frame
 	void Update () {
@@ -35,7 +35,11 @@ public class PlayerController : NetworkBehaviour {
 
             if(currentUnits.Count != 0 && hit.transform.name == "Ground" && Input.GetMouseButtonDown(0))
             {
-                CmdMoveUnits(hit.point);
+                foreach(GameObject g in currentUnits)
+                {
+                    CmdMoveUnit(g, hit.point);
+                }
+                //CmdMoveUnits(currentUnits, hit.point);
             }
         }
 
@@ -47,9 +51,9 @@ public class PlayerController : NetworkBehaviour {
 
     void Deselect()
     {
-        foreach(Unit u in currentUnits)
+        foreach(GameObject u in currentUnits)
         {
-            u.ToggleIndicator(false);
+            u.GetComponent<Unit>().ToggleIndicator(false);
         }
         currentUnits.Clear();
         selectionState = SelectionState.none;
@@ -58,16 +62,13 @@ public class PlayerController : NetworkBehaviour {
     void SelectUnit(Unit u)
     {
         selectionState = SelectionState.selected;
-        currentUnits.Add(u);
+        currentUnits.Add(u.gameObject);
         u.ToggleIndicator(true);
     }
 
     [Command]
-    void CmdMoveUnits(Vector3 newPos)
+    void CmdMoveUnit(GameObject unit, Vector3 newPos)
     {
-        foreach(Unit u in currentUnits)
-        {
-            u.GetComponent<Unit>().CmdMoveTo(newPos);
-        }
+        unit.GetComponent<Unit>().CmdMoveTo(newPos);
     }
 }
