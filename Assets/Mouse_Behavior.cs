@@ -13,10 +13,13 @@ public class Mouse_Behavior : NetworkBehaviour
     private RaycastHit hit;
     bool build = false;
 
+    PlayerController myPlayer;
+
     // Use this for initialization
     void Start ()
     {
         ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        myPlayer = GetComponent<PlayerController>();
     }
 	
     void Update()
@@ -25,21 +28,26 @@ public class Mouse_Behavior : NetworkBehaviour
         {
             return;
         }
-        if (Input.GetMouseButtonDown(0) && build)
+
+        if(myPlayer.selectionState == SelectionState.none)
         {
-            if (Physics.Raycast(ray, out hit))
+            if (Input.GetMouseButtonDown(0) && build)
             {
-                if (Valid_Placement(hit))
+                if (Physics.Raycast(ray, out hit))
                 {
-                    CmdSpawnThatShit(hit.point);
+                    if (Valid_Placement(hit))
+                    {
+                        CmdSpawnThatShit(hit.point);
+                    }
                 }
             }
+            else if (build)
+            {
+                Move_Ghost();
+            }
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         }
-        else if(build)
-        {
-            Move_Ghost();
-        }
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
     }
 
     void Move_Ghost()
