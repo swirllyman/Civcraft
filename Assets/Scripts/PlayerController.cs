@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public enum SelectionState { hover, selected, none}
 public class PlayerController : NetworkBehaviour {
 
-    public SelectionState selectionState = SelectionState.none;
     public List<GameObject> currentUnits = new List<GameObject>();
     public Color[] colorChoices;
 
@@ -22,11 +20,13 @@ public class PlayerController : NetworkBehaviour {
     Vector3 mouseStartDrag;
     Vector3 mouseEndDrag;
     PlayerController[] allPlayers;
+    PlayerState myState;
 	
     void Start()
     {
         if (isLocalPlayer)
         {
+            myState = GetComponent<PlayerState>();
             allPlayers = FindObjectsOfType<PlayerController>();
             CmdSetPlayer(allPlayers.Length);
         }
@@ -44,14 +44,28 @@ public class PlayerController : NetworkBehaviour {
     [Command]
     void CmdSetPlayer(int playerNum)
     {
-        playerColor = colorChoices[playerNum - 1];
+        playerNumber = playerNum;
+        playerColor = colorChoices[playerNumber];
+
+        RpcSetPlayer();
+    }
+
+    [ClientRpc]
+    void RpcSetPlayer()
+    {
+
+    }
+
+    void SetPlayer()
+    {
+
     }
    
 
 	// Update is called once per frame
 	void Update () {
 
-        if (!isLocalPlayer) return;
+        if (!isLocalPlayer || myState.selectionState == SelectionState.building) return;
         Mycast();
     }
 
@@ -64,8 +78,8 @@ public class PlayerController : NetworkBehaviour {
             Unit u = hit.transform.GetComponent<Unit>();
             if (u != null)
             {
-                if (selectionState == SelectionState.none)
-                    selectionState = SelectionState.hover;
+                if (myState.selectionState == SelectionState.none)
+                    myState.selectionState = SelectionState.hover;
                 if (Input.GetMouseButtonDown(0))
                 {
                     if (Input.GetKey(KeyCode.LeftShift))
@@ -104,9 +118,9 @@ public class PlayerController : NetworkBehaviour {
                         selecting = false;
                         if (!BoxSelect(hit.point))
                         {
-                            if (selectionState == SelectionState.hover)
+                            if (myState.selectionState == SelectionState.hover)
                             {
-                                selectionState = SelectionState.none;
+                                myState.selectionState = SelectionState.none;
                             }
                         }
                     }
@@ -163,13 +177,13 @@ public class PlayerController : NetworkBehaviour {
         }
 
         currentUnits.Clear();
-        selectionState = SelectionState.none;
+        myState.selectionState = SelectionState.none;
     }
 
     void SelectUnit(Unit u)
     {
 
-        selectionState = SelectionState.selected;
+        myState.selectionState = SelectionState.selected;
         currentUnits.Add(u.gameObject);
         u.ToggleIndicator(true);
         u.onDied += OnUnitDied;

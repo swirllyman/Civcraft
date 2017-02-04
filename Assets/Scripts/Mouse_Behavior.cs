@@ -13,12 +13,12 @@ public class Mouse_Behavior : NetworkBehaviour
     private RaycastHit hit;
     bool build = false;
 
-    PlayerController myPlayer;
+    PlayerState my_state;
 
     // Use this for initialization
     void Start ()
     {
-        myPlayer = GetComponent<PlayerController>();
+        my_state = GetComponent<PlayerState>();
     }
 	
     void Update()
@@ -28,7 +28,7 @@ public class Mouse_Behavior : NetworkBehaviour
             return;
         }
 
-        if(myPlayer.selectionState == SelectionState.none)
+        if(my_state.selectionState == SelectionState.none)
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Input.GetMouseButtonDown(0) && build)
