@@ -21,11 +21,32 @@ public class PlayerController : NetworkBehaviour {
     Vector3 startingMousePos;
     Vector3 mouseStartDrag;
     Vector3 mouseEndDrag;
+    PlayerController[] allPlayers;
 	
     void Start()
     {
-
+        if (isLocalPlayer)
+        {
+            allPlayers = FindObjectsOfType<PlayerController>();
+            CmdSetPlayer(allPlayers.Length);
+        }
+        else
+        {
+            Init();
+        }
     }
+
+    void Init()
+    {
+        //SetPlayer(playerNum);
+    }
+
+    [Command]
+    void CmdSetPlayer(int playerNum)
+    {
+        playerColor = colorChoices[playerNum - 1];
+    }
+   
 
 	// Update is called once per frame
 	void Update () {
