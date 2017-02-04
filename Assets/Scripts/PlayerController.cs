@@ -8,44 +8,97 @@ public class PlayerController : NetworkBehaviour {
 
     public SelectionState selectionState = SelectionState.none;
     public List<GameObject> currentUnits = new List<GameObject>();
+    bool selecting;
+    Vector3 startingMousePos;
 	
 	// Update is called once per frame
 	void Update () {
 
         if (!isLocalPlayer) return;
+        Mycast();
+
+        if (selecting)
+        {
+            var camera = Camera.main;
+            var viewportBounds = Utils.GetViewportBounds(camera, startingMousePos, Input.mousePosition);
+        }
+    }
+
+    public bool IsWithinSelectionBounds(GameObject gameObject)
+    {
+        if (!selecting)
+            return false;
+
+        var camera = Camera.main;
+        var viewportBounds =
+            Utils.GetViewportBounds(camera, startingMousePos, Input.mousePosition);
+
+        return viewportBounds.Contains(
+            camera.WorldToViewportPoint(gameObject.transform.position));
+    }
+
+    void Mycast()
+    {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
+
             Unit u = hit.transform.GetComponent<Unit>();
             if (u != null)
             {
-                if(selectionState == SelectionState.none)
+                if (selectionState == SelectionState.none)
                     selectionState = SelectionState.hover;
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (Input.GetKey(KeyCode.LeftShift))
+                    {
+                        SelectUnit(u);
+                    }
+                    else
+                    {
+                        Deselect();
+                        SelectUnit(u);
+                    }
+                }
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    selecting = true;
+                    startingMousePos = Input.mousePosition;
+                }
+
+                if (Input.GetMouseButtonUp(0))
+                {
+                    if (selecting)
+                    {
+                        selecting = false;
+                        if (selectionState == SelectionState.hover)
+                        {
+                            selectionState = SelectionState.none;
+                        }
+                    }
+                }
+            }
+
+            if (hit.transform.name == "Ground" && currentUnits.Count != 0)
+            {
+                if (Input.GetMouseButtonDown(1) && hit.point.y == 0)
+                {
+                    foreach (GameObject g in currentUnits)
+                    {
+                        CmdMoveUnit(g, hit.point);
+                    }
+                }
 
                 if (Input.GetMouseButtonDown(0))
                 {
-                    SelectUnit(u);
+                    Deselect();
                 }
-            }
-            else if(selectionState == SelectionState.hover)
-            {
-                selectionState = SelectionState.none;
-            }
 
-            if(currentUnits.Count != 0 && hit.transform.name == "Ground" && Input.GetMouseButtonDown(0))
-            {
-                foreach(GameObject g in currentUnits)
-                {
-                    CmdMoveUnit(g, hit.point);
-                }
-                //CmdMoveUnits(currentUnits, hit.point);
             }
-        }
-
-        if (Input.GetMouseButtonDown(1) && currentUnits.Count != 0)
-        {
-            Deselect();
         }
     }
 
@@ -70,5 +123,16 @@ public class PlayerController : NetworkBehaviour {
     void CmdMoveUnit(GameObject unit, Vector3 newPos)
     {
         unit.GetComponent<Unit>().CmdMoveTo(newPos);
+    }
+
+    void OnGUI()
+    {
+        if (selecting)
+        {
+            // Create a rect from both mouse positions
+            var rect = Utils.GetScreenRect(startingMousePos, Input.mousePosition);
+            Utils.DrawScreenRect(rect, new Color(0.8f, 0.8f, 0.95f, 0.25f));
+            Utils.DrawScreenRectBorder(rect, 2, new Color(0.8f, 0.8f, 0.95f));
+        }
     }
 }
