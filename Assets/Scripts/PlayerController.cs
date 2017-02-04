@@ -8,33 +8,30 @@ public class PlayerController : NetworkBehaviour {
 
     public SelectionState selectionState = SelectionState.none;
     public List<GameObject> currentUnits = new List<GameObject>();
+    public Color[] colorChoices;
+
+    [SyncVar]
+    public int playerNumber;
+    [SyncVar]
+    public int teamNumber;
+    
+    Color playerColor;
+
     bool selecting;
     Vector3 startingMousePos;
+    Vector3 mouseStartDrag;
+    Vector3 mouseEndDrag;
 	
+    void Start()
+    {
+
+    }
+
 	// Update is called once per frame
 	void Update () {
 
         if (!isLocalPlayer) return;
         Mycast();
-
-        if (selecting)
-        {
-            var camera = Camera.main;
-            var viewportBounds = Utils.GetViewportBounds(camera, startingMousePos, Input.mousePosition);
-        }
-    }
-
-    public bool IsWithinSelectionBounds(GameObject gameObject)
-    {
-        if (!selecting)
-            return false;
-
-        var camera = Camera.main;
-        var viewportBounds =
-            Utils.GetViewportBounds(camera, startingMousePos, Input.mousePosition);
-
-        return viewportBounds.Contains(
-            camera.WorldToViewportPoint(gameObject.transform.position));
     }
 
     void Mycast()
@@ -43,7 +40,6 @@ public class PlayerController : NetworkBehaviour {
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit))
         {
-
             Unit u = hit.transform.GetComponent<Unit>();
             if (u != null)
             {
@@ -61,6 +57,15 @@ public class PlayerController : NetworkBehaviour {
                         SelectUnit(u);
                     }
                 }
+
+                if (Input.GetMouseButtonDown(1) && currentUnits.Count != 0)
+                {
+                    foreach (GameObject g in currentUnits)
+                    {
+                        CmdAttack(g, u.gameObject);
+                    }
+                }
+
             }
             else
             {
@@ -68,6 +73,7 @@ public class PlayerController : NetworkBehaviour {
                 {
                     selecting = true;
                     startingMousePos = Input.mousePosition;
+                    mouseStartDrag = hit.point;
                 }
 
                 if (Input.GetMouseButtonUp(0))
@@ -75,9 +81,12 @@ public class PlayerController : NetworkBehaviour {
                     if (selecting)
                     {
                         selecting = false;
-                        if (selectionState == SelectionState.hover)
+                        if (!BoxSelect(hit.point))
                         {
-                            selectionState = SelectionState.none;
+                            if (selectionState == SelectionState.hover)
+                            {
+                                selectionState = SelectionState.none;
+                            }
                         }
                     }
                 }
@@ -97,9 +106,32 @@ public class PlayerController : NetworkBehaviour {
                 {
                     Deselect();
                 }
-
             }
         }
+    }
+
+    bool BoxSelect(Vector3 hit)
+    {
+        bool pickedUpUnits = false;
+        mouseEndDrag = hit;
+        Vector3 midpoint = (mouseStartDrag + mouseEndDrag) / 2;
+        float halfX, halfZ;
+        halfX = Mathf.Abs(mouseEndDrag.x - midpoint.x);
+        halfZ = Mathf.Abs(mouseEndDrag.z - midpoint.z);
+        Vector3 halfBox = new Vector3(halfX, 5, halfZ);
+        Collider[] cols = Physics.OverlapBox(midpoint, halfBox);
+
+        foreach (Collider c in cols)
+        {
+            Unit un = c.GetComponent<Unit>();
+            if (un != null)
+            {
+                SelectUnit(un);
+                pickedUpUnits = true;
+            }
+        }
+
+        return pickedUpUnits;
     }
 
     void Deselect()
@@ -108,22 +140,43 @@ public class PlayerController : NetworkBehaviour {
         {
             u.GetComponent<Unit>().ToggleIndicator(false);
         }
+
         currentUnits.Clear();
         selectionState = SelectionState.none;
     }
 
     void SelectUnit(Unit u)
     {
+
         selectionState = SelectionState.selected;
         currentUnits.Add(u.gameObject);
         u.ToggleIndicator(true);
+        u.onDied += OnUnitDied;
     }
+
+    public void OnUnitDied(Unit unit)
+    {
+        if (currentUnits.Contains(unit.gameObject))
+        {
+            currentUnits.Remove(unit.gameObject);
+        }
+        unit.onDied -= OnUnitDied;
+    }
+
+    #region Network Commands
 
     [Command]
     void CmdMoveUnit(GameObject unit, Vector3 newPos)
     {
         unit.GetComponent<Unit>().CmdMoveTo(newPos);
     }
+
+    [Command]
+    void CmdAttack(GameObject unit, GameObject target)
+    {
+        unit.GetComponent<Unit>().CmdAttack(target);
+    }
+    #endregion
 
     void OnGUI()
     {

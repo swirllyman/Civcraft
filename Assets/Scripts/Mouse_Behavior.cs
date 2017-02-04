@@ -18,7 +18,6 @@ public class Mouse_Behavior : NetworkBehaviour
     // Use this for initialization
     void Start ()
     {
-        ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         myPlayer = GetComponent<PlayerController>();
     }
 	
@@ -31,6 +30,7 @@ public class Mouse_Behavior : NetworkBehaviour
 
         if(myPlayer.selectionState == SelectionState.none)
         {
+            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Input.GetMouseButtonDown(0) && build)
             {
                 if (Physics.Raycast(ray, out hit))
@@ -45,7 +45,6 @@ public class Mouse_Behavior : NetworkBehaviour
             {
                 Move_Ghost();
             }
-            ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         }
 
     }
