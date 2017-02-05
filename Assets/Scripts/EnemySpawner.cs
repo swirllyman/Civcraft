@@ -7,10 +7,17 @@ public class EnemySpawner : NetworkBehaviour
     public GameObject enemyPrefab;
     public int numberOfEnemies;
 
-    public float spawnTimer = 5.0f;
-    void Start()
+    public float spawnTimer = 0.0f;
+
+    int teamNum;
+    Color teamColor;
+
+    [Server]
+    public void Init(Color c, int team)
     {
-        if (!isServer) return;
+        GetComponent<Renderer>().material.color = c;
+        teamColor = c;
+        teamNum = team;
         StartCoroutine(SpawnAfterTime());
     }
 
@@ -32,12 +39,7 @@ public class EnemySpawner : NetworkBehaviour
     [Command]
     void CmdSetupUnit(GameObject g)
     {
-        RpcSetupUnit(g);
-    }
+        g.GetComponent<Unit>().CmdSetup(teamNum, teamColor);
 
-    [ClientRpc]
-    void RpcSetupUnit(GameObject g)
-    {
-        g.GetComponent<Renderer>().material.color = GetComponent<Renderer>().material.color;
     }
 }

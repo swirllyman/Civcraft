@@ -83,13 +83,7 @@ public class Mouse_Behavior : NetworkBehaviour
 
         var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation);
         NetworkServer.Spawn(enemy);
-        RpcSpawnBuilding(enemy);
-    }
-
-    [ClientRpc]
-    void RpcSpawnBuilding(GameObject spawned)
-    {
-        spawned.GetComponent<Renderer>().material.color = myPlayer.playerColor;
+        enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
     }
 
     void OnGUI()

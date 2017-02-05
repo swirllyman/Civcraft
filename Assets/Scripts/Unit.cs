@@ -154,6 +154,19 @@ public class Unit : NetworkBehaviour {
     }
 
     [Command]
+    public void CmdSetup(int teamNum, Color teamColor)
+    {
+        RpcSetup(teamNum, teamColor);
+    }
+
+    [ClientRpc]
+    void RpcSetup(int teamNum, Color teamColor)
+    {
+        GetComponent<Renderer>().material.color = teamColor;
+        team = teamNum;
+    }
+
+    [Command]
     void CmdKB()
     {
         RpcKB();
