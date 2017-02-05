@@ -7,10 +7,12 @@ public class Mouse_Behavior : NetworkBehaviour
 
     public GameObject ghost_2_2;
     public GameObject ghost_1_1;
+    public GameObject building_2_2;
+    public GameObject building_1_1;
 
     private Vector3 building_size;
     private GameObject ghost_object;
-    private int choiceNum;
+    private NetworkHash128 chosen_building;
 
     private Collider ghost_collider;
     private Ray ray;
@@ -42,7 +44,10 @@ public class Mouse_Behavior : NetworkBehaviour
                 {
                     if (Valid_Placement(hit))
                     {
-                        CmdSpawnThatShit(hit.point, choiceNum);
+                        float x_position = building_size.x % 2 == 0 ? Mathf.RoundToInt(hit.point.x) : (Mathf.Floor(hit.point.x) + .5f);
+                        float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(hit.point.z) : (Mathf.Floor(hit.point.z) + .5f);
+                        var spawnPosition = new Vector3(x_position, building_size.y / 2.0f, z_position);
+                        CmdSpawnThatShit(spawnPosition, chosen_building);
                     }
                 }
             }
@@ -77,14 +82,12 @@ public class Mouse_Behavior : NetworkBehaviour
     }
 
     [Command]
-    void CmdSpawnThatShit(Vector3 spawnSpot, int choice)
+    void CmdSpawnThatShit(Vector3 spawnSpot, NetworkHash128 chosen_building)
     {
-        float x_position = building_size.x % 2 == 0 ? Mathf.RoundToInt(spawnSpot.x) : (Mathf.Floor(spawnSpot.x) + .5f);
-        float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(spawnSpot.z) : (Mathf.Floor(spawnSpot.z) + .5f);
-        var spawnPosition = new Vector3 (x_position, building_size.y / 2.0f, z_position);
         var spawnRotation = Quaternion.Euler(0, 0, 0);
-
-        GameObject enemy = Instantiate(buildings[choice], spawnPosition, spawnRotation);
+        GameObject game_o;
+        ClientScene.prefabs.TryGetValue(chosen_building, out game_o);
+        GameObject enemy = Instantiate(game_o, spawnSpot, spawnRotation);
         NetworkServer.Spawn(enemy);
         enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
     }
@@ -101,7 +104,7 @@ public class Mouse_Behavior : NetworkBehaviour
             my_state.SwitchState(SelectionState.building);
             if (my_state.Get_State() == SelectionState.building)
             {
-                choiceNum = 2;
+                chosen_building = building_2_2.GetComponent<NetworkIdentity>().assetId;
                 building_size = new Vector3(2, 2, 2);
                 ghost_object = (GameObject)Instantiate(ghost_2_2, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
                 ghost_collider = ghost_object.GetComponent<Collider>();
@@ -116,7 +119,7 @@ public class Mouse_Behavior : NetworkBehaviour
             my_state.SwitchState(SelectionState.building);
             if (my_state.Get_State() == SelectionState.building)
             {
-                choiceNum = 1;
+                chosen_building = building_1_1.GetComponent<NetworkIdentity>().assetId;
                 building_size = new Vector3(1, 1, 1);
                 ghost_object = (GameObject)Instantiate(ghost_1_1, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
                 ghost_collider = ghost_object.GetComponent<Collider>();
