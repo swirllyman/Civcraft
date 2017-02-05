@@ -145,7 +145,8 @@ public class Unit : NetworkBehaviour {
     {
         if (dead || g == null || g.GetComponent<Unit>().dead) return;
         g.GetComponent<Unit>().onDied += OnTargetDied;
-        agent.ResetPath();
+        if(agent != null)
+            agent.ResetPath();
         currentState = AIState.attack;
         target = g;
     }
