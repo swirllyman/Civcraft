@@ -5,35 +5,36 @@ using UnityEngine;
 public enum SelectionState { hover, selected, building, none }
 public class PlayerState : MonoBehaviour {
 
-    public SelectionState selectionState = SelectionState.none;
+    private SelectionState selectionState = SelectionState.none;
     
     public void SwitchState(SelectionState newState)
     {
-        switch(newState)
+        switch(selectionState)
         {
             case SelectionState.hover:
-                selectionState = SelectionState.hover;
+                newState = SelectionState.hover;
                 break;
             case SelectionState.selected:
-                selectionState = SelectionState.selected;
+                newState = SelectionState.selected;
                 break;
             case SelectionState.building:
-                switch(selectionState)
+                switch(newState)
                 {
                     case SelectionState.hover:
                     case SelectionState.selected:
                     case SelectionState.none:
-                        selectionState = SelectionState.building;
+                        newState = SelectionState.building;
                         break;
                     case SelectionState.building:
-                        selectionState = SelectionState.none;
+                        newState = SelectionState.none;
                         break;
                 }
                 break;
             case SelectionState.none:
-                selectionState = SelectionState.none;
+                newState = SelectionState.none;
                 break;
         }
+        selectionState = newState;
     }
 
     public SelectionState Get_State()
