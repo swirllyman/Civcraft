@@ -15,7 +15,8 @@ public class PlayerController : NetworkBehaviour {
     [SyncVar]
     public Color playerColor;
 
-    bool selecting;
+    public bool selecting { get; set; }
+
     Vector3 startingMousePos;
     Vector3 mouseStartDrag;
     Vector3 mouseEndDrag;

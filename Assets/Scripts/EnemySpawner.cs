@@ -16,7 +16,8 @@ public class EnemySpawner : NetworkBehaviour
 
     void Start()
     {
-        hud = FindObjectOfType<NetworkManagerHUDCustom>();
+        if(isLocalPlayer)
+            hud = FindObjectOfType<NetworkManagerHUDCustom>();
     }
 
     [Server]
@@ -66,6 +67,7 @@ public class EnemySpawner : NetworkBehaviour
     [ClientRpc]
     void RpcSetupUnit()
     {
-        hud.AddUnit();
+        if(isLocalPlayer)
+            hud.AddUnit();
     }
 }

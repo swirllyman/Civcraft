@@ -6,6 +6,12 @@ public enum SelectionState { hover, selected, building, none }
 public class PlayerState : MonoBehaviour {
 
     public SelectionState selectionState = SelectionState.none;
+    PlayerController myPlayer;
+
+    void Start()
+    {
+        myPlayer = GetComponent<PlayerController>();
+    }
     
     public void SwitchState(SelectionState newState)
     {
@@ -31,6 +37,8 @@ public class PlayerState : MonoBehaviour {
                 }
                 break;
             case SelectionState.none:
+                if(selectionState == SelectionState.building)
+                    myPlayer.selecting = false;
                 selectionState = SelectionState.none;
                 break;
         }

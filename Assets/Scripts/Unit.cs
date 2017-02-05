@@ -143,6 +143,7 @@ public class Unit : NetworkBehaviour {
     [ClientRpc]
     void RpcAttack(GameObject g)
     {
+        if (dead || g == null || g.GetComponent<Unit>().dead) return;
         g.GetComponent<Unit>().onDied += OnTargetDied;
         agent.ResetPath();
         currentState = AIState.attack;
@@ -158,6 +159,7 @@ public class Unit : NetworkBehaviour {
     [ClientRpc]
     void RpcTakeDamage(int damage)
     {
+        if (dead) return;
         bool KB = myHealth.TakeDamage(damage);
         if (KB)
         {
@@ -196,6 +198,7 @@ public class Unit : NetworkBehaviour {
     void CmdDeath()
     {
         RpcDeath();
+        StartCoroutine(DieAfterTime());
     }
 
     [ClientRpc]
@@ -217,14 +220,13 @@ public class Unit : NetworkBehaviour {
         dead = true;
         if (onDied != null)
             onDied(this);
-
-        StartCoroutine(DieAfterTime());
     }
 
+    [Server]
     IEnumerator DieAfterTime()
     {
         yield return new WaitForSeconds(1.0f);
-        Destroy(gameObject);
+        NetworkServer.Destroy(gameObject);
     }
 
     public void ToggleIndicator(bool toggle)
