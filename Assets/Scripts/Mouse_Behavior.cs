@@ -14,11 +14,13 @@ public class Mouse_Behavior : NetworkBehaviour
     bool build = false;
 
     PlayerState my_state;
+    PlayerController myPlayer;
 
     // Use this for initialization
     void Start ()
     {
         my_state = GetComponent<PlayerState>();
+        myPlayer = GetComponent<PlayerController>();
     }
 	
     void Update()
@@ -81,6 +83,13 @@ public class Mouse_Behavior : NetworkBehaviour
 
         var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation);
         NetworkServer.Spawn(enemy);
+        RpcSpawnBuilding(enemy);
+    }
+
+    [ClientRpc]
+    void RpcSpawnBuilding(GameObject spawned)
+    {
+        spawned.GetComponent<Renderer>().material.color = myPlayer.playerColor;
     }
 
     void OnGUI()
