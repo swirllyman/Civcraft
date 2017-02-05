@@ -22,8 +22,9 @@ public class EnemySpawner : NetworkBehaviour
     [Server]
     public void Init(Color c, int team)
     {
-        CmdInit(c, team);
-        StartCoroutine(SpawnAfterTime());
+        print("Spawned -- Time 2: " + Time.time);
+        //CmdInit(c, team);
+        //StartCoroutine(SpawnAfterTime());
     }
 
     [Command]
