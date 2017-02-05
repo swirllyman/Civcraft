@@ -15,7 +15,9 @@ public class Unit : NetworkBehaviour {
     public enum AIState { idle, attack, chase, move, flee, none }
     public delegate void OnDied(Unit unit);
     public event OnDied onDied;
-    GameObject target;
+
+    [HideInInspector]
+    public GameObject target;
     NavMeshAgent agent;
     public AIState currentState = AIState.idle;
     Health myHealth;
@@ -119,6 +121,15 @@ public class Unit : NetworkBehaviour {
         agent.ResetPath();
         agent.SetDestination(pos);
         currentState = AIState.move;
+    }
+
+    //This is called from non networked objects
+    public void Attack(GameObject g)
+    {
+        if (isServer)
+        {
+            CmdAttack(g);
+        }
     }
 
     [Command]
