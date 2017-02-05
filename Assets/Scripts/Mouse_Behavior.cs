@@ -16,7 +16,6 @@ public class Mouse_Behavior : NetworkBehaviour
     PlayerState my_state;
     PlayerController myPlayer;
 
-    // Use this for initialization
     void Start ()
     {
         my_state = GetComponent<PlayerState>();
@@ -53,7 +52,7 @@ public class Mouse_Behavior : NetworkBehaviour
 
     void Move_Ghost()
     {
-        Physics.Raycast(ray, out hit);
+        Physics.Raycast(ray, out hit, layer_mask);
         ghost_object.transform.position = new Vector3(Mathf.RoundToInt(hit.point.x), 2, Mathf.RoundToInt(hit.point.z));
     }
 
@@ -67,10 +66,6 @@ public class Mouse_Behavior : NetworkBehaviour
             {
                 return false;
             }
-        }
-        if(!hit_object.transform.gameObject.tag.Equals("Building"))
-        {
-
         }
         return true;
     }
@@ -96,8 +91,28 @@ public class Mouse_Behavior : NetworkBehaviour
         if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * .175f, Screen.width * .04f, Screen.height * .07f), "Click"))
         {
             my_state.SwitchState(SelectionState.building);
-            ghost_object = (GameObject)Instantiate(ghost_building, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
-            ghost_collider = ghost_object.GetComponent<Collider>();
+            if (my_state.Get_State() == SelectionState.building)
+            {
+                ghost_object = (GameObject)Instantiate(ghost_building, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
+                ghost_collider = ghost_object.GetComponent<Collider>();
+            }
+            else
+            {
+                Destroy(ghost_object);
+            }
+        }
+        if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * (.175f * 2), Screen.width * .04f, Screen.height * .07f), "Click"))
+        {
+            my_state.SwitchState(SelectionState.building);
+            if (my_state.Get_State() == SelectionState.building)
+            {
+                ghost_object = (GameObject)Instantiate(ghost_building, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
+                ghost_collider = ghost_object.GetComponent<Collider>();
+            }
+            else
+            {
+                Destroy(ghost_object);
+            }
         }
     }
 }
