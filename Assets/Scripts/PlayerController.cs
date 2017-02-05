@@ -214,6 +214,7 @@ public class PlayerController : NetworkBehaviour {
 
     void OnGUI()
     {
+        if (myState.Get_State() == SelectionState.building) return;
         if (selecting)
         {
             // Create a rect from both mouse positions

@@ -5,7 +5,7 @@ using UnityEngine;
 public enum SelectionState { hover, selected, building, none }
 public class PlayerState : MonoBehaviour {
 
-    private SelectionState selectionState = SelectionState.none;
+    public  SelectionState selectionState = SelectionState.none;
     
     public void SwitchState(SelectionState newState)
     {
