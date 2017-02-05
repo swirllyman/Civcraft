@@ -1,5 +1,6 @@
 ﻿using UnityEngine.Networking;
 using UnityEngine;
+using System.Collections.Generic;
 
 public class Mouse_Behavior : NetworkBehaviour
 {
@@ -19,6 +20,8 @@ public class Mouse_Behavior : NetworkBehaviour
     private RaycastHit hit;
     private int layer_mask = ((1 << 8) | Physics.IgnoreRaycastLayer);
 
+    private Dictionary<NetworkHash128, GameObject> hash_codes;
+
     PlayerState my_state;
     PlayerController myPlayer;
 
@@ -30,6 +33,8 @@ public class Mouse_Behavior : NetworkBehaviour
         building_1_1 = (Resources.Load("Buildings/Spawn_Small") as GameObject).GetComponent<NetworkIdentity>().assetId;
         ghost_2_2 = Resources.Load("Buildings/Ghost_Big") as GameObject;
         ghost_1_1 = Resources.Load("Buildings/Ghost_Small") as GameObject;
+        hash_codes = ClientScene.prefabs;
+
     }
 	
     void Update()
@@ -95,7 +100,7 @@ public class Mouse_Behavior : NetworkBehaviour
     {
         var spawnRotation = Quaternion.Euler(0, 0, 0);
         GameObject game_o;
-        ClientScene.prefabs.TryGetValue(chosen_building, out game_o);
+        hash_codes.TryGetValue(chosen_building, out game_o);
         GameObject enemy = Instantiate(game_o, spawnSpot, spawnRotation);
         NetworkServer.Spawn(enemy);
         enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
