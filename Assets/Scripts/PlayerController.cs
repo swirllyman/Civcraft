@@ -177,7 +177,9 @@ public class PlayerController : NetworkBehaviour {
     {
         foreach(GameObject u in currentUnits)
         {
-            u.GetComponent<Unit>().ToggleIndicator(false);
+            if (u != null) {
+                u.GetComponent<Unit>().ToggleIndicator(false);
+            }
         }
 
         currentUnits.Clear();
