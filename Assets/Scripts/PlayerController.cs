@@ -12,8 +12,8 @@ public class PlayerController : NetworkBehaviour {
     public int playerNumber;
     [SyncVar]
     public int teamNumber;
-    
-    Color playerColor;
+    [SyncVar]
+    public Color playerColor;
 
     bool selecting;
     Vector3 startingMousePos;
@@ -38,27 +38,29 @@ public class PlayerController : NetworkBehaviour {
 
     void Init()
     {
-        //SetPlayer(playerNum);
+        SetPlayer(playerNumber);
     }
 
     [Command]
     void CmdSetPlayer(int playerNum)
     {
-        playerNumber = playerNum;
-        playerColor = colorChoices[playerNumber];
-
-        RpcSetPlayer();
+        RpcSetPlayer(playerNum);
     }
 
     [ClientRpc]
-    void RpcSetPlayer()
+    void RpcSetPlayer(int playerNum)
     {
-
+        SetPlayer(playerNum);
     }
 
-    void SetPlayer()
+    void SetPlayer(int playerNum)
     {
-
+        if(playerNum != 0)
+        {
+            name = "Player " + playerNum;
+            playerNumber = playerNum;
+            playerColor = colorChoices[playerNumber - 1];
+        }
     }
    
 
@@ -79,7 +81,7 @@ public class PlayerController : NetworkBehaviour {
             if (u != null)
             {
                 if (myState.selectionState == SelectionState.none)
-                    myState.selectionState = SelectionState.hover;
+                    myState.SwitchState(SelectionState.hover);
                 if (Input.GetMouseButtonDown(0))
                 {
                     if (Input.GetKey(KeyCode.LeftShift))
@@ -116,12 +118,9 @@ public class PlayerController : NetworkBehaviour {
                     if (selecting)
                     {
                         selecting = false;
-                        if (!BoxSelect(hit.point))
+                        if (!BoxSelect(hit.point) && myState.selectionState == SelectionState.hover)
                         {
-                            if (myState.selectionState == SelectionState.hover)
-                            {
-                                myState.selectionState = SelectionState.none;
-                            }
+                            myState.SwitchState(SelectionState.none);
                         }
                     }
                 }
@@ -177,13 +176,13 @@ public class PlayerController : NetworkBehaviour {
         }
 
         currentUnits.Clear();
-        myState.selectionState = SelectionState.none;
+        myState.SwitchState(SelectionState.none);
     }
 
     void SelectUnit(Unit u)
     {
 
-        myState.selectionState = SelectionState.selected;
+        myState.SwitchState(SelectionState.selected);
         currentUnits.Add(u.gameObject);
         u.ToggleIndicator(true);
         u.onDied += OnUnitDied;

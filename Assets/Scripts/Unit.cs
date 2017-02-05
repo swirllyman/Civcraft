@@ -31,6 +31,7 @@ public class Unit : NetworkBehaviour {
     bool attacking = true;
     bool dead = false;
 
+    public int team;
 
     // Use this for initialization
     void Start() {
