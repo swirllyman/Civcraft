@@ -99,6 +99,7 @@ public class Mouse_Behavior : NetworkBehaviour
     [Command]
     void CmdSpawnThatShit(Vector3 spawnSpot)//, NetworkHash128 chosen_building)
     {
+        print("Command Spawning -- Time 1: " + Time.time);
         var spawnRotation = Quaternion.Euler(0, 0, 0);
         GameObject game_o;
         //hash_codes.TryGetValue(chosen_building, out game_o);

@@ -69,6 +69,15 @@ public class PlayerController : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        if (isLocalPlayer)
+        {
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                print("T time on press: " + Time.time);
+                CmdClick();
+            }
+        }
+
         if (!isLocalPlayer || myState.Get_State() == SelectionState.building) return;
         Mycast();
     }
@@ -144,6 +153,18 @@ public class PlayerController : NetworkBehaviour {
                 }
             }
         }
+    }
+
+    [Command]
+    void CmdClick()
+    {
+        RpcClick();
+    }
+
+    [ClientRpc]
+    void RpcClick()
+    {
+        print("Time the rpc arrived: " + Time.time);
     }
 
     bool BoxSelect(Vector3 hit)
