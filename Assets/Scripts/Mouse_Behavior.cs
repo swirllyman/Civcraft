@@ -56,6 +56,7 @@ public class Mouse_Behavior : NetworkBehaviour
                         float x_position = building_size.x % 2 == 0 ? Mathf.RoundToInt(hit.point.x) : (Mathf.Floor(hit.point.x) + .5f);
                         float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(hit.point.z) : (Mathf.Floor(hit.point.z) + .5f);
                         var spawnPosition = new Vector3(x_position, building_size.y / 2.0f, z_position);
+                        print("Spawning -- Time 1: " + Time.time);
                         CmdSpawnThatShit(spawnPosition, chosen_building);
                     }
                 }

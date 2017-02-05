@@ -38,6 +38,8 @@ public class EnemySpawner : NetworkBehaviour
         GetComponent<Renderer>().material.color = c;
         teamColor = c;
         teamNum = team;
+
+        print("Spawned -- Time 2: " + Time.time);
     }
 
     IEnumerator SpawnAfterTime()
