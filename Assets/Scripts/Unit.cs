@@ -15,11 +15,11 @@ public class Unit : NetworkBehaviour {
     public enum AIState { idle, attack, chase, move, flee, none }
     public delegate void OnDied(Unit unit);
     public event OnDied onDied;
+    public AIState currentState = AIState.idle;
 
     [HideInInspector]
     public GameObject target;
     NavMeshAgent agent;
-    public AIState currentState = AIState.idle;
     Health myHealth;
 
     public GameObject selectedIndicator;
@@ -32,11 +32,13 @@ public class Unit : NetworkBehaviour {
     float attackTimer;
     bool attacking = true;
     bool dead = false;
-
     public int team;
+
+    AttackTriggger attackTrigger;
 
     // Use this for initialization
     void Start() {
+        attackTrigger = GetComponentInChildren<AttackTriggger>();
         agent = GetComponent<NavMeshAgent>();
         selectedIndicator.SetActive(false);
         agent.speed = speed;
@@ -141,6 +143,7 @@ public class Unit : NetworkBehaviour {
     [ClientRpc]
     void RpcAttack(GameObject g)
     {
+        g.GetComponent<Unit>().onDied += OnTargetDied;
         agent.ResetPath();
         currentState = AIState.attack;
         target = g;
@@ -200,12 +203,21 @@ public class Unit : NetworkBehaviour {
     {
         OnDeath();
     }
-
     #endregion
+
+    public void OnTargetDied(Unit unit)
+    {
+        if (dead) return;
+        attackTrigger.CheckArea();
+        unit.onDied -= OnTargetDied;
+    }
+
     public void OnDeath()
     {
+        dead = true;
         if (onDied != null)
             onDied(this);
+
         StartCoroutine(DieAfterTime());
     }
 
