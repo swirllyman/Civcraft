@@ -34,7 +34,7 @@ public class Mouse_Behavior : NetworkBehaviour
         ghost_2_2 = Resources.Load("Buildings/Ghost_Big") as GameObject;
         ghost_1_1 = Resources.Load("Buildings/Ghost_Small") as GameObject;
         hash_codes = ClientScene.prefabs;
-        //buildings = new GameObject[] { Resources.Load("Buildings/Spawn_Big") as GameObject };
+        buildings = new GameObject[] { Resources.Load("Buildings/Spawn_Big") as GameObject };
     }
 	
     void Update()
@@ -57,7 +57,7 @@ public class Mouse_Behavior : NetworkBehaviour
                         float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(hit.point.z) : (Mathf.Floor(hit.point.z) + .5f);
                         var spawnPosition = new Vector3(x_position, building_size.y / 2.0f, z_position);
                         print("Spawning -- Time 1: " + Time.time);
-                        CmdSpawnThatShit(spawnPosition, chosen_building);
+                        CmdSpawnThatShit(spawnPosition);//, chosen_building);
                     }
                 }
             }
@@ -97,12 +97,12 @@ public class Mouse_Behavior : NetworkBehaviour
     }
 
     [Command]
-    void CmdSpawnThatShit(Vector3 spawnSpot, NetworkHash128 chosen_building)
+    void CmdSpawnThatShit(Vector3 spawnSpot)//, NetworkHash128 chosen_building)
     {
         var spawnRotation = Quaternion.Euler(0, 0, 0);
         GameObject game_o;
-        hash_codes.TryGetValue(chosen_building, out game_o);
-        //game_o = buildings[0];
+        //hash_codes.TryGetValue(chosen_building, out game_o);
+        game_o = buildings[0];
         GameObject enemy = Instantiate(game_o, spawnSpot, spawnRotation);
         NetworkServer.Spawn(enemy);
         enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
