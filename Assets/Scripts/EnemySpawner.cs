@@ -19,7 +19,7 @@ public class EnemySpawner : NetworkBehaviour
         //hud = FindObjectOfType<NetworkManagerHUDCustom>();
     }
 
-    [Server]
+    [Server] 
     public void Init(Color c, int team)
     {
         print("Spawned -- Time 2: " + Time.time);
