@@ -28,7 +28,7 @@ public class Mouse_Behavior : NetworkBehaviour
             return;
         }
 
-        if(my_state.selectionState == SelectionState.none)
+        if(my_state.Get_State() == SelectionState.building)
         {
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Input.GetMouseButtonDown(0) && build)
@@ -92,7 +92,7 @@ public class Mouse_Behavior : NetworkBehaviour
         GUI.Box(new Rect(Screen.width * .05f, Screen.height * .15f, Screen.width * .14f, Screen.height * .48f), "");
         if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * .175f, Screen.width * .04f, Screen.height * .07f), "Click"))
         {
-            build = !build;
+            my_state.SwitchState(SelectionState.building);
             ghost_object = (GameObject)Instantiate(ghost_building, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
             ghost_collider = ghost_object.GetComponent<Collider>();
         }
