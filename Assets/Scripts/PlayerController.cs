@@ -57,9 +57,10 @@ public class PlayerController : NetworkBehaviour {
     {
         if(playerNum != 0)
         {
-            name = "Player " + playerNum;
             playerNumber = playerNum;
             playerColor = colorChoices[playerNumber - 1];
+            name = "Player " + playerNum;
+            teamNumber = playerNum;
         }
     }
    
@@ -82,7 +83,7 @@ public class PlayerController : NetworkBehaviour {
             {
                 if (myState.Get_State() == SelectionState.none)
                     myState.SwitchState(SelectionState.hover);
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0) && u.team == teamNumber)
                 {
                     if (Input.GetKey(KeyCode.LeftShift))
                     {
@@ -160,8 +161,11 @@ public class PlayerController : NetworkBehaviour {
             Unit un = c.GetComponent<Unit>();
             if (un != null)
             {
-                SelectUnit(un);
-                pickedUpUnits = true;
+                if (un.team == teamNumber)
+                {
+                    SelectUnit(un);
+                    pickedUpUnits = true;
+                }
             }
         }
 
@@ -214,7 +218,7 @@ public class PlayerController : NetworkBehaviour {
 
     void OnGUI()
     {
-        if (myState.Get_State() == SelectionState.building) return;
+        if (!isLocalPlayer || myState.Get_State() == SelectionState.building) return;
         if (selecting)
         {
             // Create a rect from both mouse positions

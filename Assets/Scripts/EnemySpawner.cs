@@ -15,10 +15,22 @@ public class EnemySpawner : NetworkBehaviour
     [Server]
     public void Init(Color c, int team)
     {
+        CmdInit(c, team);
+        StartCoroutine(SpawnAfterTime());
+    }
+
+    [Command]
+    void CmdInit(Color c, int team)
+    {
+        RpcInit(c, team);
+    }
+
+    [ClientRpc]
+    void RpcInit(Color c, int team)
+    {
         GetComponent<Renderer>().material.color = c;
         teamColor = c;
         teamNum = team;
-        StartCoroutine(SpawnAfterTime());
     }
 
     IEnumerator SpawnAfterTime()
