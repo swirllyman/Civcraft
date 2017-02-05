@@ -12,11 +12,11 @@ public class EnemySpawner : NetworkBehaviour
     int teamNum;
     Color teamColor;
 
-    NetworkManagerHUDCustom hud;
+    //NetworkManagerHUDCustom hud;
 
     void Start()
     {
-        hud = FindObjectOfType<NetworkManagerHUDCustom>();
+        //hud = FindObjectOfType<NetworkManagerHUDCustom>();
     }
 
     [Server]
@@ -59,13 +59,13 @@ public class EnemySpawner : NetworkBehaviour
     void CmdSetupUnit(GameObject g)
     {
         g.GetComponent<Unit>().CmdSetup(teamNum, teamColor);
-        RpcSetupUnit();
+        //RpcSetupUnit();
 
     }
 
     [ClientRpc]
     void RpcSetupUnit()
     {
-        hud.AddUnit();
+        //hud.AddUnit();
     }
 }
