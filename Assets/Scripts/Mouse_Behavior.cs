@@ -3,14 +3,14 @@ using UnityEngine;
 
 public class Mouse_Behavior : NetworkBehaviour
 {
-    public GameObject bldg_2_2;
+    public GameObject[] buildings;
+
     public GameObject ghost_2_2;
-    public GameObject bldg_1_1;
     public GameObject ghost_1_1;
 
     private Vector3 building_size;
     private GameObject ghost_object;
-    private GameObject chosen_building;
+    private int choiceNum;
 
     private Collider ghost_collider;
     private Ray ray;
@@ -42,7 +42,7 @@ public class Mouse_Behavior : NetworkBehaviour
                 {
                     if (Valid_Placement(hit))
                     {
-                        CmdSpawnThatShit(hit.point);
+                        CmdSpawnThatShit(hit.point, choiceNum);
                     }
                 }
             }
@@ -77,14 +77,14 @@ public class Mouse_Behavior : NetworkBehaviour
     }
 
     [Command]
-    void CmdSpawnThatShit(Vector3 spawnSpot)
+    void CmdSpawnThatShit(Vector3 spawnSpot, int choice)
     {
         float x_position = building_size.x % 2 == 0 ? Mathf.RoundToInt(spawnSpot.x) : (Mathf.Floor(spawnSpot.x) + .5f);
         float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(spawnSpot.z) : (Mathf.Floor(spawnSpot.z) + .5f);
         var spawnPosition = new Vector3 (x_position, building_size.y / 2.0f, z_position);
         var spawnRotation = Quaternion.Euler(0, 0, 0);
 
-        var enemy = (GameObject)Instantiate(chosen_building, spawnPosition, spawnRotation);
+        GameObject enemy = Instantiate(buildings[choice], spawnPosition, spawnRotation);
         NetworkServer.Spawn(enemy);
         enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
     }
@@ -101,7 +101,7 @@ public class Mouse_Behavior : NetworkBehaviour
             my_state.SwitchState(SelectionState.building);
             if (my_state.Get_State() == SelectionState.building)
             {
-                chosen_building = bldg_2_2;
+                choiceNum = 2;
                 building_size = new Vector3(2, 2, 2);
                 ghost_object = (GameObject)Instantiate(ghost_2_2, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
                 ghost_collider = ghost_object.GetComponent<Collider>();
@@ -116,7 +116,7 @@ public class Mouse_Behavior : NetworkBehaviour
             my_state.SwitchState(SelectionState.building);
             if (my_state.Get_State() == SelectionState.building)
             {
-                chosen_building = bldg_1_1;
+                choiceNum = 1;
                 building_size = new Vector3(1, 1, 1);
                 ghost_object = (GameObject)Instantiate(ghost_1_1, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
                 ghost_collider = ghost_object.GetComponent<Collider>();
