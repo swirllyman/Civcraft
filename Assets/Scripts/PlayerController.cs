@@ -67,7 +67,7 @@ public class PlayerController : NetworkBehaviour {
 	// Update is called once per frame
 	void Update () {
 
-        if (!isLocalPlayer || myState.selectionState == SelectionState.building) return;
+        if (!isLocalPlayer || myState.Get_State() == SelectionState.building) return;
         Mycast();
     }
 
@@ -80,7 +80,7 @@ public class PlayerController : NetworkBehaviour {
             Unit u = hit.transform.GetComponent<Unit>();
             if (u != null)
             {
-                if (myState.selectionState == SelectionState.none)
+                if (myState.Get_State() == SelectionState.none)
                     myState.SwitchState(SelectionState.hover);
                 if (Input.GetMouseButtonDown(0))
                 {
@@ -118,7 +118,7 @@ public class PlayerController : NetworkBehaviour {
                     if (selecting)
                     {
                         selecting = false;
-                        if (!BoxSelect(hit.point) && myState.selectionState == SelectionState.hover)
+                        if (!BoxSelect(hit.point) && myState.Get_State() == SelectionState.hover)
                         {
                             myState.SwitchState(SelectionState.none);
                         }
