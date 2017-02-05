@@ -21,8 +21,11 @@ namespace UnityEngine.Networking
         //NetworkMatch
 		// Runtime variable
 		bool showServer = false;
-        
 
+        void Start()
+        {
+
+        }
 		void Awake()
 		{
 			manager = GetComponent<NetworkManager>();
