@@ -34,7 +34,7 @@ public class Mouse_Behavior : NetworkBehaviour
         ghost_2_2 = Resources.Load("Buildings/Ghost_Big") as GameObject;
         ghost_1_1 = Resources.Load("Buildings/Ghost_Small") as GameObject;
         hash_codes = ClientScene.prefabs;
-        buildings = new GameObject[] { Resources.Load("Buildings/Spawn_Big") as GameObject };
+        //buildings = new GameObject[] { Resources.Load("Buildings/Spawn_Big") as GameObject };
     }
 	
     void Update()
@@ -101,8 +101,8 @@ public class Mouse_Behavior : NetworkBehaviour
     {
         var spawnRotation = Quaternion.Euler(0, 0, 0);
         GameObject game_o;
-        //hash_codes.TryGetValue(chosen_building, out game_o);
-        game_o = buildings[0];
+        hash_codes.TryGetValue(chosen_building, out game_o);
+        //game_o = buildings[0];
         GameObject enemy = Instantiate(game_o, spawnSpot, spawnRotation);
         NetworkServer.Spawn(enemy);
         enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
