@@ -11,6 +11,7 @@ public class Mouse_Behavior : NetworkBehaviour
     private Collider ghost_collider;
     private Ray ray;
     private RaycastHit hit;
+    private int layer_mask = ((1 << 8) | Physics.IgnoreRaycastLayer);
 
     PlayerState my_state;
     PlayerController myPlayer;
@@ -34,7 +35,7 @@ public class Mouse_Behavior : NetworkBehaviour
             ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             if (Input.GetMouseButtonDown(0))
             {
-                if (Physics.Raycast(ray, out hit))
+                if (Physics.Raycast(ray, out hit, layer_mask))
                 {
                     if (Valid_Placement(hit))
                     {
@@ -52,7 +53,6 @@ public class Mouse_Behavior : NetworkBehaviour
 
     void Move_Ghost()
     {
-        Debug.Log("MOCING");
         Physics.Raycast(ray, out hit);
         ghost_object.transform.position = new Vector3(Mathf.RoundToInt(hit.point.x), 2, Mathf.RoundToInt(hit.point.z));
     }
