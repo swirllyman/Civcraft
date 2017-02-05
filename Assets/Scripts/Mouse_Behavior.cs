@@ -3,10 +3,14 @@ using UnityEngine;
 
 public class Mouse_Behavior : NetworkBehaviour
 {
-    public GameObject enemyPrefab;
-    public GameObject ghost_building;
-    public GameObject ghost_object;
-    public Vector2 building_size;
+    public GameObject bldg_2_2;
+    public GameObject ghost_2_2;
+    public GameObject bldg_1_1;
+    public GameObject ghost_1_1;
+
+    private Vector3 building_size;
+    private GameObject ghost_object;
+    private GameObject chosen_building;
 
     private Collider ghost_collider;
     private Ray ray;
@@ -53,7 +57,9 @@ public class Mouse_Behavior : NetworkBehaviour
     void Move_Ghost()
     {
         Physics.Raycast(ray, out hit, layer_mask);
-        ghost_object.transform.position = new Vector3(Mathf.RoundToInt(hit.point.x), 2, Mathf.RoundToInt(hit.point.z));
+        float x_position = building_size.x % 2 == 0 ? Mathf.RoundToInt(hit.point.x) : (Mathf.Floor(hit.point.x) + .5f);
+        float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(hit.point.z) : (Mathf.Floor(hit.point.z) + .5f);
+        ghost_object.transform.position = new Vector3(x_position, building_size.y / 2.0f, z_position);
     }
 
     bool Valid_Placement(RaycastHit hit_object)
@@ -73,10 +79,12 @@ public class Mouse_Behavior : NetworkBehaviour
     [Command]
     void CmdSpawnThatShit(Vector3 spawnSpot)
     {
-        var spawnPosition = new Vector3 (Mathf.RoundToInt(spawnSpot.x), 2, Mathf.RoundToInt(spawnSpot.z));
+        float x_position = building_size.x % 2 == 0 ? Mathf.RoundToInt(spawnSpot.x) : (Mathf.Floor(spawnSpot.x) + .5f);
+        float z_position = building_size.z % 2 == 0 ? Mathf.RoundToInt(spawnSpot.z) : (Mathf.Floor(spawnSpot.z) + .5f);
+        var spawnPosition = new Vector3 (x_position, building_size.y / 2.0f, z_position);
         var spawnRotation = Quaternion.Euler(0, 0, 0);
 
-        var enemy = (GameObject)Instantiate(enemyPrefab, spawnPosition, spawnRotation);
+        var enemy = (GameObject)Instantiate(chosen_building, spawnPosition, spawnRotation);
         NetworkServer.Spawn(enemy);
         enemy.GetComponent<EnemySpawner>().Init(myPlayer.playerColor, myPlayer.playerNumber);
     }
@@ -88,12 +96,14 @@ public class Mouse_Behavior : NetworkBehaviour
             return;
         }
         GUI.Box(new Rect(Screen.width * .05f, Screen.height * .15f, Screen.width * .14f, Screen.height * .48f), "");
-        if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * .175f, Screen.width * .04f, Screen.height * .07f), "Click"))
+        if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * .175f, Screen.width * .04f, Screen.height * .07f), "2x2"))
         {
             my_state.SwitchState(SelectionState.building);
             if (my_state.Get_State() == SelectionState.building)
             {
-                ghost_object = (GameObject)Instantiate(ghost_building, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
+                chosen_building = bldg_2_2;
+                building_size = new Vector3(2, 2, 2);
+                ghost_object = (GameObject)Instantiate(ghost_2_2, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
                 ghost_collider = ghost_object.GetComponent<Collider>();
             }
             else
@@ -101,12 +111,14 @@ public class Mouse_Behavior : NetworkBehaviour
                 Destroy(ghost_object);
             }
         }
-        if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * (.175f * 2), Screen.width * .04f, Screen.height * .07f), "Click"))
+        if (GUI.Button(new Rect(Screen.width * .078f, Screen.height * (.175f * 2), Screen.width * .04f, Screen.height * .07f), "1x1"))
         {
             my_state.SwitchState(SelectionState.building);
             if (my_state.Get_State() == SelectionState.building)
             {
-                ghost_object = (GameObject)Instantiate(ghost_building, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
+                chosen_building = bldg_1_1;
+                building_size = new Vector3(1, 1, 1);
+                ghost_object = (GameObject)Instantiate(ghost_1_1, new Vector3(0, 0, 0), Quaternion.Euler(0, 0, 0));
                 ghost_collider = ghost_object.GetComponent<Collider>();
             }
             else
